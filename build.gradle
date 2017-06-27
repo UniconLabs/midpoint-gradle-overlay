@@ -1,0 +1,20 @@
+apply from: 'http://dl.bintray.com/scalding/generic/waroverlay.gradle'
+
+repositories {
+    maven { url 'http://nexus.evolveum.com/nexus/content/groups/public' }
+    mavenCentral(artifactUrls: 'http://jasperreports.sourceforge.net/maven2')
+    maven { url 'http://jaspersoft.artifactoryonline.com/jaspersoft/third-party-ce-artifacts/'}
+}
+
+dependencies {
+    compile "com.evolveum.midpoint.gui:admin-gui:${project.'midpoint.version'}"
+}
+
+war {
+    baseName 'midpoint'
+    includeWarJars = true
+}
+
+task wrapper (type: Wrapper) {
+    gradleVersion = 4.0
+}
