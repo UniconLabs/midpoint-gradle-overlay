@@ -8,6 +8,7 @@ repositories {
 
 dependencies {
     compile "com.evolveum.midpoint.gui:admin-gui:${project.'midpoint.version'}"
+    compile "org.springframework.security:spring-security-cas:4.1.0.RELEASE"
 }
 
 war {
