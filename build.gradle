@@ -1,3 +1,7 @@
+plugins {
+    id 'java'
+}
+
 apply from: 'http://dl.bintray.com/scalding/generic/waroverlay.gradle'
 
 repositories {
@@ -6,8 +10,25 @@ repositories {
     maven { url 'http://jaspersoft.artifactoryonline.com/jaspersoft/third-party-ce-artifacts/'}
 }
 
+configurations.all {
+    resolutionStrategy {
+        eachDependency {
+            if (it.requested.group == 'org.springframework') {
+                it.useVersion '4.3.12.RELEASE'
+            }
+            if (it.requested.group == 'org.springframework.security') {
+                it.useVersion '4.2.3.RELEASE'
+            }
+        }
+    }
+}
+
 dependencies {
-    compile "com.evolveum.midpoint.gui:admin-gui:${project.'midpoint.version'}"
+    compile "com.evolveum.midpoint.gui:admin-gui:${project.'midpoint.version'}", { transitive = true }
+    compileOnly "com.evolveum.midpoint.gui:admin-gui:${project.'midpoint.version'}:classes"
+    // compile "org.springframework.security:spring-security-cas:4.1.0.RELEASE"
+    compile "org.pac4j:spring-security-pac4j:3.0.0"
+    compile "org.pac4j:pac4j-saml:2.2.1"
 }
 
 war {
@@ -16,5 +37,5 @@ war {
 }
 
 task wrapper (type: Wrapper) {
-    gradleVersion = 4.0
+    gradleVersion = '4.4.1'
 }
