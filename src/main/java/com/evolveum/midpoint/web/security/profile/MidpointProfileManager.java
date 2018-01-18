@@ -19,21 +19,30 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.function.Function;
 
 public class MidpointProfileManager extends ProfileManager<CommonProfile> {
     private static final Authorizer<CommonProfile> IS_REMEMBERED_AUTHORIZER = new IsRememberedAuthorizer<>();
 
     private static final Authorizer<CommonProfile> IS_FULLY_AUTHENTICATED_AUTHORIZER = new IsFullyAuthenticatedAuthorizer<>();
 
-    UserProfileService userProfileService;
+    final UserProfileService userProfileService;
+
+    final Function<SAML2Profile, String> usernameExtractor;
 
     public MidpointProfileManager(WebContext context) {
-        this(context, null);
+        this(context, null, null);
     }
 
-    public MidpointProfileManager(WebContext context, UserProfileService userProfileService) {
+    public MidpointProfileManager(WebContext context, UserProfileService userProfileService, Function<SAML2Profile, String> usernameExtractor) {
         super(context);
         this.userProfileService = userProfileService;
+
+        if (usernameExtractor == null) {
+            this.usernameExtractor = x -> x.getUsername();
+        } else {
+            this.usernameExtractor = usernameExtractor;
+        }
     }
 
     @Override
@@ -46,7 +55,7 @@ public class MidpointProfileManager extends ProfileManager<CommonProfile> {
             try {
                 if (IS_FULLY_AUTHENTICATED_AUTHORIZER.isAuthorized(null, listProfiles) || IS_REMEMBERED_AUTHORIZER.isAuthorized(null, listProfiles)) {
                     SAML2Profile saml2Profile = (SAML2Profile) profiles.get("Saml2Client");
-                    MidPointPrincipal principal = this.userProfileService.getPrincipal((String) saml2Profile.getAttribute("uid", List.class).get(0));
+                    MidPointPrincipal principal = this.userProfileService.getPrincipal(usernameExtractor.apply(saml2Profile));
                     SecurityContextHolder.getContext().setAuthentication(new MidpointPac4jAuthenticationToken(profiles, principal));
                 }
             } catch (final HttpAction e) {

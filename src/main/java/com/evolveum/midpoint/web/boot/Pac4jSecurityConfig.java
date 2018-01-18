@@ -26,6 +26,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.function.Function;
 
 @Profile({"pac4j"})
@@ -93,7 +94,7 @@ public class Pac4jSecurityConfig {
 
         @Override
         public ProfileManager apply(J2EContext webContext) {
-            return new MidpointProfileManager(webContext, userProfileService);
+            return new MidpointProfileManager(webContext, userProfileService, x -> (String)x.getAttribute("uid", List.class).get(0));
         }
     }
 
