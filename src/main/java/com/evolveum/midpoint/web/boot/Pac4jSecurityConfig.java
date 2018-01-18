@@ -59,6 +59,9 @@ public class Pac4jSecurityConfig {
     @Value("${saml.callbackUrl}")
     private String callbackUrl;
 
+    @Value("${saml.wantAssertionsSigned:true}")
+    private boolean wantAssertionsSigned;
+
     @Bean
     public Config config() {
         final SAML2ClientConfiguration saml2ClientConfiguration = new SAML2ClientConfiguration();
@@ -70,6 +73,7 @@ public class Pac4jSecurityConfig {
         saml2ClientConfiguration.setServiceProviderEntityId(serviceProviderEntityId);
         saml2ClientConfiguration.setServiceProviderMetadataPath(serviceProviderMetadataPath);
         saml2ClientConfiguration.setForceServiceProviderMetadataGeneration(forceServiceProviderMetadataGeneration);
+        saml2ClientConfiguration.setWantsAssertionsSigned(wantAssertionsSigned);
 
         final SAML2Client saml2Client = new SAML2Client(saml2ClientConfiguration);
         saml2Client.setName("Saml2Client");
