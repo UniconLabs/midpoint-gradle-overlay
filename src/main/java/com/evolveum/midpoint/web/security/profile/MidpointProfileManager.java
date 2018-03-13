@@ -8,12 +8,14 @@ import com.evolveum.midpoint.web.security.authentication.MidpointPac4jAuthentica
 import org.pac4j.core.authorization.authorizer.Authorizer;
 import org.pac4j.core.authorization.authorizer.IsFullyAuthenticatedAuthorizer;
 import org.pac4j.core.authorization.authorizer.IsRememberedAuthorizer;
+import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.exception.HttpAction;
 import org.pac4j.core.exception.TechnicalException;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.ProfileHelper;
 import org.pac4j.core.profile.ProfileManager;
+import org.pac4j.core.profile.UserProfile;
 import org.pac4j.saml.profile.SAML2Profile;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -28,18 +30,18 @@ public class MidpointProfileManager extends ProfileManager<CommonProfile> {
 
     final UserProfileService userProfileService;
 
-    final Function<SAML2Profile, String> usernameExtractor;
+    final Function<UserProfile, String> usernameExtractor;
 
     public MidpointProfileManager(WebContext context) {
         this(context, null, null);
     }
 
-    public MidpointProfileManager(WebContext context, UserProfileService userProfileService, Function<SAML2Profile, String> usernameExtractor) {
+    public MidpointProfileManager(WebContext context, UserProfileService userProfileService, Function<UserProfile, String> usernameExtractor) {
         super(context);
         this.userProfileService = userProfileService;
 
         if (usernameExtractor == null) {
-            this.usernameExtractor = x -> x.getUsername();
+            this.usernameExtractor = x -> (String) x.getAttribute(Pac4jConstants.USERNAME);
         } else {
             this.usernameExtractor = usernameExtractor;
         }
